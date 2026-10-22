@@ -22,7 +22,7 @@ Vá em **[Releases](../../releases/latest)** e baixe o arquivo `vX.XX_Desafio_Tr
 
 ## O que tem na versão atual
 
-- Campanha do Leon: Kanto e Johto completos
+- Campanha do Leon: Kanto, Johto, Galar e o Torneio das Três Coroas completos
 - Campanha do Red: Galar, Johto e Kanto completos, do Monte Prata até o Monte Prata
 
 ---
