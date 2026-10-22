@@ -1,0 +1,512 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Desafio das Três Regiões</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: abertura com captura do jogo e rota Kanto-Johto-Galar; depois apresentação, história, elenco, as 24 insígnias, cenários, instalação e apoio. */
+  :root {
+    --bg: #f3f5ee; --surface: #fdfef9; --fg: #131e17; --muted: #52625a; --line: #d2dac9;
+    --accent: #17784a; --accent-fg: #ffffff; --warm: #d6452c; --warm-fg: #ffffff;
+    --sky1: #a9dcf0; --sky2: #e6f5ea;
+    --kanto: #d6452c; --johto: #c58a10; --galar: #6a45c2;
+    --f-display: "Press Start 2P", "Courier New", monospace;
+    --f-body: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b130f; --surface: #14201a; --fg: #e8f0ea; --muted: #9db1a4; --line: #25382c;
+      --accent: #62d896; --accent-fg: #06150d; --warm: #ff7f66; --warm-fg: #1d0a05;
+      --sky1: #0f2236; --sky2: #1b3a48;
+      --kanto: #ff7f66; --johto: #f0b84a; --galar: #a98bff;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b130f; --surface: #14201a; --fg: #e8f0ea; --muted: #9db1a4; --line: #25382c;
+    --accent: #62d896; --accent-fg: #06150d; --warm: #ff7f66; --warm-fg: #1d0a05;
+    --sky1: #0f2236; --sky2: #1b3a48;
+    --kanto: #ff7f66; --johto: #f0b84a; --galar: #a98bff;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font: 400 17px/1.65 var(--f-body);
+    padding-block: 0 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  a { color: var(--accent); }
+  img { max-width: 100%; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 10px 24px; padding-block: 18px; flex-wrap: wrap; }
+  .brand { font: 400 11px/1.5 var(--f-display); }
+  .top nav { display: flex; gap: 6px 18px; flex-wrap: wrap; font-weight: 500; font-size: 15px; }
+  .top nav a { color: var(--muted); text-decoration: none; }
+  .top nav a:hover { color: var(--fg); }
+
+  /* abertura */
+  .hero { border: 3px solid var(--fg); border-radius: 22px; background: linear-gradient(160deg, var(--sky1), var(--sky2)); box-shadow: 8px 8px 0 var(--line); padding: clamp(24px, 5vw, 52px); display: grid; grid-template-columns: 1.05fr .95fr; gap: 36px; align-items: center; }
+  .hero > * { min-width: 0; }
+  .tag { display: inline-block; font: 400 10px/1.6 var(--f-display); letter-spacing: .04em; background: var(--surface); border: 2px solid var(--fg); padding: 7px 10px; margin-bottom: 20px; }
+  h1 { font: 400 clamp(22px, 4.6vw, 40px)/1.35 var(--f-display); margin: 0 0 14px; text-wrap: balance; }
+  .slogan { font: 600 clamp(18px, 2.4vw, 22px)/1.4 var(--f-body); margin: 0 0 14px; }
+  .lead { font-size: 18px; margin: 0 0 26px; max-width: 52ch; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 22px 0 0; padding: 0; list-style: none; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .meta b { font-weight: 600; }
+  .frame { margin: 0; border: 3px solid var(--fg); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: 6px 6px 0 var(--fg); }
+  .frame img { display: block; width: 100%; aspect-ratio: 16 / 11; object-fit: cover; image-rendering: pixelated; }
+  .frame figcaption { font: 400 9px/1.7 var(--f-display); padding: 10px 12px; border-top: 3px solid var(--fg); background: var(--surface); }
+
+  .route { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 10px; margin-top: 28px; }
+  .route .stop { border: 2px solid var(--fg); background: var(--surface); border-radius: 10px; padding: 10px 12px; text-align: center; min-width: 0; }
+  .route .stop b { display: block; font: 400 11px/1.4 var(--f-display); }
+  .route .stop span { font-size: 13px; color: var(--muted); }
+  .route .arrow { font: 400 14px/1 var(--f-display); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font: 600 17px/1 var(--f-body); padding: 16px 24px; border-radius: 10px; border: 2px solid var(--fg); cursor: pointer; text-decoration: none; box-shadow: 4px 4px 0 var(--fg); color: var(--fg); }
+  .btn-main { background: var(--accent); color: var(--accent-fg); }
+  .btn-main[aria-disabled="true"] { opacity: .6; pointer-events: none; }
+  .btn-ghost { background: var(--surface); }
+  .btn-warm { background: var(--warm); color: var(--warm-fg); }
+  .btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--fg); }
+  .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--fg); }
+
+  section { padding-block: 76px 0; }
+  .kicker { display: block; font: 400 10px/1.6 var(--f-display); letter-spacing: .06em; color: var(--accent); margin-bottom: 14px; }
+  h2 { font: 400 clamp(17px, 3.2vw, 24px)/1.5 var(--f-display); margin: 0 0 26px; text-wrap: balance; }
+  h2::after { content: ""; display: block; width: 56px; height: 6px; margin-top: 16px; background: var(--accent); box-shadow: 8px 0 0 var(--warm); }
+  .intro { max-width: 62ch; color: var(--muted); margin: -8px 0 28px; }
+
+  /* apresentação */
+  .about { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; align-items: start; }
+  .about > * { min-width: 0; }
+  .about .big { font-size: clamp(19px, 2.4vw, 23px); line-height: 1.6; margin: 0 0 16px; }
+  .about p { margin: 0 0 14px; color: var(--muted); }
+  .facts { margin: 0; padding: 0; list-style: none; background: var(--surface); border: 2px solid var(--fg); border-radius: 14px; box-shadow: 6px 6px 0 var(--line); }
+  .facts li { display: flex; justify-content: space-between; gap: 16px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .facts li:last-child { border-bottom: 0; }
+  .facts span { color: var(--muted); }
+  .facts b { font-weight: 600; text-align: right; }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; list-style: none; padding: 0; margin: 40px 0 0; }
+  .features li { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
+  .features h3 { margin: 0 0 6px; font-size: 18px; }
+  .features p { margin: 0; color: var(--muted); font-size: 16px; }
+
+  /* história */
+  .story { background: var(--surface); border: 2px solid var(--fg); border-radius: 18px; padding: clamp(22px, 5vw, 52px); box-shadow: 8px 8px 0 var(--line); display: grid; gap: 22px; }
+  .story p { margin: 0; max-width: 68ch; font-size: 18px; }
+  .story p:first-child::first-letter { font: 400 44px/1 var(--f-display); float: left; padding: 6px 12px 0 0; color: var(--accent); }
+  .story .pull { border-left: 6px solid var(--warm); padding-left: 18px; font-weight: 600; font-size: 20px; }
+
+  /* elenco */
+  .cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+  .card { background: var(--surface); border: 2px solid var(--fg); border-radius: 16px; overflow: hidden; display: grid; grid-template-columns: 1fr; min-width: 0; }
+  .card .portrait { background: linear-gradient(180deg, var(--sky2), var(--sky1)); border-bottom: 2px solid var(--fg); display: grid; place-items: end center; padding: 20px 12px 0; min-height: 320px; }
+  .card canvas { width: 120px; height: auto; image-rendering: pixelated; display: block; margin-bottom: 20px; align-self: center; }
+  .card .portrait img { height: 290px; width: auto; max-width: 100%; object-fit: contain; display: block; }
+  .card .info { padding: 16px 18px 18px; min-width: 0; }
+  .card .role { font: 400 9px/1.6 var(--f-display); letter-spacing: .04em; display: block; margin-bottom: 8px; }
+  .card .role.k { color: var(--kanto); } .card .role.g { color: var(--galar); }
+  .card h3 { margin: 0 0 6px; font-size: 22px; }
+  .card p { margin: 0; color: var(--muted); font-size: 16px; }
+
+  /* regiões */
+  .regions { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .region { background: var(--surface); border: 2px solid var(--fg); border-radius: 16px; overflow: hidden; min-width: 0; }
+  .region header { padding: 16px 20px; border-bottom: 2px solid var(--fg); color: #fff; }
+  .region.kanto header { background: var(--kanto); } .region.johto header { background: var(--johto); } .region.galar header { background: var(--galar); }
+  :root[data-theme="dark"] .region header, :root:not([data-theme="light"]) .region header { color: #10161a; }
+  .region h3 { margin: 0; font: 400 15px/1.4 var(--f-display); }
+  .region header span { font-size: 14px; opacity: .92; }
+  .region ol { margin: 0; padding: 6px 0; list-style: none; counter-reset: g; }
+  .region li { counter-increment: g; display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 9px 20px; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .region li:last-child { border-bottom: 0; }
+  .region li::before { content: counter(g); font: 400 10px/1 var(--f-display); color: var(--muted); }
+  .region li b { display: block; font-weight: 600; }
+  .region li small { color: var(--muted); font-size: 14px; }
+  .liga { padding: 14px 20px; border-top: 2px solid var(--fg); background: var(--bg); font-size: 15px; color: var(--muted); }
+
+  /* pokédex */
+  .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .tab { font: 600 16px/1 var(--f-body); padding: 12px 18px; border-radius: 10px; border: 2px solid var(--fg); background: var(--surface); color: var(--fg); cursor: pointer; }
+  .tab small { font-weight: 500; color: var(--muted); margin-left: 6px; }
+  .tab[aria-selected="true"] { background: var(--accent); color: var(--accent-fg); box-shadow: 4px 4px 0 var(--fg); }
+  .tab[aria-selected="true"] small { color: inherit; opacity: .85; }
+  .dex { margin: 0; border: 3px solid var(--fg); border-radius: 16px; overflow: hidden; background: #171c2d; box-shadow: 8px 8px 0 var(--line); }
+  .dex a { display: block; }
+  .dex img { display: block; width: 100%; height: auto; image-rendering: auto; }
+  .dex figcaption { padding: 12px 16px; font-size: 14px; color: #c3cad9; background: #11162a; border-top: 3px solid var(--fg); }
+
+  /* cenários */
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .shots figure { margin: 0; border: 2px solid var(--fg); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: 5px 5px 0 var(--line); }
+  .shots img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; image-rendering: pixelated; }
+  .shots figcaption { padding: 12px 14px; font-size: 15px; border-top: 2px solid var(--fg); color: var(--muted); }
+  .shots figcaption b { color: var(--fg); }
+
+  /* instalação */
+  .steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; counter-reset: s; }
+  .steps li { counter-increment: s; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 18px 64px; position: relative; min-width: 0; }
+  .steps li::before { content: counter(s); position: absolute; left: 18px; top: 16px; width: 34px; height: 34px; display: grid; place-items: center; font: 400 12px/1 var(--f-display); background: var(--accent); color: var(--accent-fg); border-radius: 8px; }
+
+  /* apoio */
+  .support { background: var(--surface); border: 3px solid var(--fg); border-radius: 20px; padding: clamp(22px, 4.5vw, 44px); display: grid; grid-template-columns: 1fr 1fr; gap: 32px; box-shadow: 8px 8px 0 var(--warm); }
+  .support > * { min-width: 0; }
+  .support h2 { margin-bottom: 18px; }
+  .support p { margin: 0 0 14px; color: var(--muted); }
+  .pix { background: var(--bg); border: 2px solid var(--fg); border-radius: 14px; padding: 18px; }
+  .pix label { display: block; font: 600 13px/1.4 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .pix code { display: block; font: 500 16px/1.5 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; user-select: all; margin-bottom: 14px; }
+  .qr { text-align: center; margin-bottom: 18px; }
+  .qr img { display: block; width: 100%; max-width: 230px; height: auto; margin: 0 auto 8px; background: #fff; padding: 10px; border: 2px solid var(--fg); border-radius: 12px; image-rendering: pixelated; }
+  .qr p { margin: 0; font-size: 14px; color: var(--muted); }
+  .pix code { max-height: 5.4em; overflow: auto; font-size: 13px; }
+  .pix .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .pix .ok { color: var(--accent); font-weight: 600; font-size: 15px; }
+  .links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+
+  footer { margin-top: 72px; padding-top: 24px; border-top: 2px solid var(--line); color: var(--muted); font-size: 14px; line-height: 1.7; }
+  footer p { margin: 0 0 10px; max-width: 82ch; }
+
+  @media (max-width: 800px) {
+    .hero, .about, .support { grid-template-columns: 1fr; }
+    .hero { box-shadow: 5px 5px 0 var(--line); gap: 28px; }
+    .actions .btn { width: 100%; }
+    section { padding-block: 56px 0; }
+    .support { box-shadow: 5px 5px 0 var(--warm); }
+    .route { grid-template-columns: 1fr; }
+    .route .arrow { transform: rotate(90deg); justify-self: center; }
+  }
+  @media (max-width: 420px) { .card { grid-template-columns: 1fr; } .card .portrait { border-right: 0; border-bottom: 2px solid var(--fg); } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn:hover, .btn:active { transform: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">DESAFIO DAS TRÊS REGIÕES</div>
+    <nav aria-label="Seções">
+      <a href="#apresentacao">Apresentação</a>
+      <a href="#historia">História</a>
+      <a href="#personagens">Personagens</a>
+      <a href="#regioes">Insígnias</a>
+      <a href="#pokedex">Pokédex</a>
+      <a href="#cenarios">Cenários</a>
+      <a href="#instalar">Jogar</a>
+      <a href="#apoiar">Apoiar</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <span class="tag">FAN GAME POKÉMON · GRÁTIS</span>
+        <h1>Desafio das Três Regiões</h1>
+        <p class="slogan">Seis desafiantes. Três regiões. Vinte e quatro insígnias.</p>
+        <p class="lead">Escolha um dos seis nomes que receberam o convite do Leon e atravesse Kanto, Johto e Galar, começando do zero e com o time lacrado até provar que o merece.</p>
+        <div class="actions">
+          <a class="btn btn-main" id="downloadBtn" href="#" target="_blank" rel="noopener">⬇ Baixar grátis</a>
+          <a class="btn btn-ghost" href="#apoiar">Apoiar o projeto</a>
+        </div>
+        <ul class="meta" aria-label="Informações da versão">
+          <li>Versão <b id="metaVersion"></b></li>
+          <li>Para <b id="metaPlatform"></b></li>
+          <li>Tamanho <b id="metaSize"></b></li>
+        </ul>
+      </div>
+      <figure class="frame">
+        <img src="img/cine_tohjo.png" alt="Cenário do jogo: as Cachoeiras Tohjo, na fronteira entre Kanto e Johto" width="1248" height="672">
+        <figcaption>CACHOEIRAS TOHJO · CENA DO JOGO</figcaption>
+      </figure>
+    </div>
+
+    <div class="route" aria-label="Rota do desafio">
+      <div class="stop"><b>KANTO</b><span>8 insígnias</span></div>
+      <div class="arrow" aria-hidden="true">▶</div>
+      <div class="stop"><b>JOHTO</b><span>8 insígnias</span></div>
+      <div class="arrow" aria-hidden="true">▶</div>
+      <div class="stop"><b>GALAR</b><span>8 insígnias</span></div>
+    </div>
+
+    <section id="apresentacao">
+      <span class="kicker">O JOGO</span>
+      <h2>Apresentação</h2>
+      <div class="about">
+        <div id="aboutText"></div>
+        <ul class="facts" id="facts"></ul>
+      </div>
+      <ul class="features" id="features"></ul>
+    </section>
+
+    <section id="historia">
+      <span class="kicker">ENREDO</span>
+      <h2>A história</h2>
+      <div class="story" id="story"></div>
+    </section>
+
+    <section id="personagens">
+      <span class="kicker">ELENCO</span>
+      <h2>Escolha o seu desafiante</h2>
+      <p class="intro">Cada personagem tem campanha, cenas e diálogos próprios. A escolha acontece logo na introdução do jogo.</p>
+      <div class="cast" id="cast"></div>
+    </section>
+
+    <section id="regioes">
+      <span class="kicker">A JORNADA</span>
+      <h2>As 24 insígnias</h2>
+      <p class="intro">Oito ginásios em cada região. A dificuldade dos líderes acompanha a ordem em que você visita as regiões.</p>
+      <div class="regions" id="regions"></div>
+    </section>
+
+    <section id="pokedex">
+      <span class="kicker">POKÉDEX</span>
+      <h2>898 Pokémon, da 1ª à 8ª geração</h2>
+      <p class="intro">Cada região tem a sua Pokédex. Escolha uma aba para ver todos os Pokémon que podem aparecer no jogo.</p>
+      <div class="tabs" role="tablist" aria-label="Pokédex por região" id="dexTabs"></div>
+      <figure class="dex" id="dexView">
+        <a id="dexLink" href="#" target="_blank" rel="noopener" aria-label="Abrir a Pokédex em tamanho real">
+          <img id="dexImg" alt="" width="1600" height="1200">
+        </a>
+        <figcaption id="dexCap"></figcaption>
+      </figure>
+    </section>
+
+    <section id="cenarios">
+      <span class="kicker">GALERIA</span>
+      <h2>Cenários do jogo</h2>
+      <div class="shots" id="shots"></div>
+    </section>
+
+    <section id="instalar">
+      <span class="kicker">COMO JOGAR</span>
+      <h2>Instalação</h2>
+      <ol class="steps" id="steps"></ol>
+    </section>
+
+    <section id="apoiar">
+      <div class="support">
+        <div>
+          <h2>Apoie o projeto</h2>
+          <p>O jogo é e continua sendo gratuito. Não existe nada bloqueado para quem não doa.</p>
+          <p>Se você gostou e quer ajudar de alguma forma, mande um e-mail. Toda conversa sobre apoio é combinada diretamente com o desenvolvedor.</p>
+          <div class="links" id="extraLinks"></div>
+        </div>
+        <div class="pix">
+          <label for="contactMail">Fale com o desenvolvedor</label>
+          <p>Quer apoiar o projeto, ajudar no desenvolvimento ou mandar uma ideia? Escreva para:</p>
+          <code id="contactMail" tabindex="0"></code>
+          <div class="row">
+            <a class="btn btn-warm" id="mailBtn" href="#">Enviar e-mail</a>
+            <button class="btn btn-ghost" id="copyMail" type="button">Copiar e-mail</button>
+            <span class="ok" id="copyMsg" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Este é um projeto de fã, sem fins comerciais e sem qualquer vínculo com Nintendo, Game Freak, Creatures Inc. ou The Pokémon Company. Pokémon e os nomes relacionados são marcas de seus respectivos proprietários.</p>
+    <p>O jogo é gratuito. Nenhum apoio compra o jogo nem libera conteúdo.</p>
+    <p>Feito com Pokémon Essentials v21.1 e o plugin Following Pokémon EX. <span id="authorLine"></span></p>
+  </footer>
+</div>
+
+<script>
+  // Edite só este bloco para personalizar a página.
+  var CONFIG = {
+    authorName: "",                 // opcional: aparece no rodapé como "Criado por ..."
+    downloadUrl: "https://github.com/ATUALIZZE/desafio-tres-regioes/releases/latest",                // cole aqui o link de download (Drive, Mega, itch.io, GitHub...)
+    version: "0.15",
+    platform: "Windows 64 bits",
+    size: "97 MB",
+    contactEmail: "evecarr@gmail.com",   // e-mail de contato para quem quiser apoiar
+    extraLinks: [],                 // ex.: { label: "Apoia.se", url: "https://..." }
+
+    about: [
+      "Depois de dez anos invicto, o ex-campeão de Galar quer lembrar como era não ser ninguém. O desafio dele: vinte e quatro insígnias em três regiões, um Pokémon novo e o time de cada participante lacrado até que prove merecê-lo de volta.",
+      "Você escolhe quem vai ser, escolhe um parceiro de estrada que passa a segui-lo pelo mapa e vive uma campanha cheia de cenas, escolhas nos diálogos e batalhas de ginásio contra líderes de Kanto, Johto e Galar."
+    ],
+    facts: [
+      { label: "Regiões", value: "Kanto, Johto e Galar" },
+      { label: "Insígnias", value: "24 (8 por região)" },
+      { label: "Personagens jogáveis", value: "6" },
+      { label: "Pokémon", value: "898 (1ª a 8ª geração)" },
+      { label: "Motor", value: "Pokémon Essentials 21.1" },
+      { label: "Idioma", value: "Português" },
+      { label: "Campanhas prontas", value: "Leon (Kanto e Johto) e Red (completa)" },
+      { label: "Status", value: "Em desenvolvimento" }
+    ],
+    features: [
+      { title: "Seis campanhas", text: "Leon, Red, Nessa, Blue, Cynthia e Lyra começam em pontos diferentes e vivem histórias diferentes." },
+      { title: "Time lacrado", text: "O time antigo fica trancado. Todo desafiante recomeça com um inicial e um parceiro de estrada que o acompanha pelo mapa." },
+      { title: "Cenas de cinema", text: "Aberturas com câmera passeando pelo cenário, arte deslizando na tela e títulos de capítulo, feitas dentro do próprio jogo." },
+      { title: "Escolhas que importam", text: "Os diálogos têm opções, e o que você responde muda a conversa e o rumo de personagens ao longo da campanha." },
+      { title: "Objetivo no menu", text: "O menu de pausa mostra o que fazer agora e o caminho, mapa a mapa, até o próximo destino." },
+      { title: "Líderes que evoluem", text: "Cada ginásio tem times diferentes conforme a ordem das regiões: o mesmo líder fica mais forte na segunda e na terceira vez." }
+    ],
+    story: [
+      "Wyndon, Galar. Leon sobe ao palco da Battle Tower e anuncia que vai recomeçar do zero. Quem aceitar o desafio enfrenta vinte e quatro ginásios em três regiões, com os times lacrados até provarem que ainda os merecem.",
+      "Cinco convites partem naquela noite: para a lenda do Monte Prata, que não desce de lá há seis anos; para o rival que foi campeão por cinco minutos; para a campeã de Sinnoh; para a garota que um dia venceu o Red; e para a líder de Hulbury que virou capa de revista.",
+      "Numa TV pequena, num bar escuro, um homem de sobretudo preto abre um livro de apostas. No quadro-negro ao lado, seis nomes e números escritos a giz. Pelas estradas, uma estudante de cinema com uma câmera antiga filma tudo, mesmo quando pedem que ela desligue.",
+      "A partir daí, cada desafiante segue o próprio caminho: um cruza Kanto e Johto a pé, outro desce a montanha para voltar para casa, outro abandona o ginásio no meio da madrugada. Todos acabam no mesmo lugar."
+    ],
+    pull: "Vinte e quatro insígnias. Três regiões. Um Pokémon novo.",
+
+    // Personagens: o avatar em pixel art é gerado pela página. Para usar uma arte sua, preencha "image" com o link da imagem.
+    characters: [
+      { name: "Leon", start: "Kanto", text: "O ex-campeão de Galar, invicto por dez anos. Começa em Kanto, onde uma banca de apostas precisa que ele perca na hora certa.", image: "img/char_leon.png" },
+      { name: "Red", start: "Galar", text: "A lenda do Monte Prata. Desceu da montanha depois de seis anos. Começa em Galar, e fala muito pouco.", image: "img/char_red.png" },
+      { name: "Nessa", start: "Kanto", text: "A líder de Hulbury e modelo de capa de revista. Começa em Kanto, onde o rosto dela está em todos os painéis.", image: "img/char_nessa.png" },
+      { name: "Blue", start: "Galar", text: "Foi campeão por cinco minutos, até o Red entrar na sala. Começa em Galar, querendo ficar sempre mais forte.", image: "img/char_blue.png" },
+      { name: "Cynthia", start: "Kanto", text: "A campeã de Sinnoh que perdeu uma exibição para uma menina de doze anos. Começa em Kanto, para reconquistar o lugar dela.", image: "img/char_cynthia.png" },
+      { name: "Lyra", start: "Kanto", text: "A garota que venceu o Red no Monte Prata. Começa em Kanto, querendo ser ninguém por alguns meses.", image: "img/char_lyra.png" }
+    ],
+
+    regions: [
+      { id: "kanto", name: "KANTO", sub: "Insígnias 1 a 8", gyms: [
+        ["Pewter", "Brock", "Insígnia da Rocha"], ["Cerulean", "Misty", "Insígnia da Cascata"], ["Vermilion", "Elesa", "Insígnia do Trovão"], ["Celadon", "Erika", "Insígnia do Arco-Íris"],
+        ["Fuchsia", "Janine", "Insígnia da Alma"], ["Saffron", "Sabrina", "Insígnia do Pântano"], ["Cinnabar", "Blaine", "Insígnia do Vulcão"], ["Viridian", "Silver", "Insígnia da Terra"] ],
+        liga: "Liga Pokémon no Platô Índigo, com a Elite dos Quatro e o campeão." },
+      { id: "johto", name: "JOHTO", sub: "Insígnias 9 a 16", gyms: [
+        ["Violet", "Walker", "Insígnia do Zéfiro"], ["Azalea", "Aaron", "Insígnia da Colmeia"], ["Goldenrod", "Whitney", "Insígnia da Planície"], ["Ecruteak", "Fantina", "Insígnia da Névoa"],
+        ["Cianwood", "Chuck", "Insígnia da Tempestade"], ["Olivine", "Jasmine", "Insígnia Mineral"], ["Mahogany", "Pryce", "Insígnia da Geleira"], ["Blackthorn", "Clair", "Insígnia da Ascensão"] ],
+        liga: "Elite dos Quatro de Johto e um campeão no fim da estrada." },
+      { id: "galar", name: "GALAR", sub: "Insígnias 17 a 24", gyms: [
+        ["Turffield", "Milo", "Insígnia da Planta"], ["Hulbury", "Wake", "Insígnia da Água"], ["Motostoke", "Flannery", "Insígnia do Fogo"], ["Stow-on-Side", "Bea e Allister", "Insígnia do Punho e da Sombra"],
+        ["Ballonlea", "Bede", "Insígnia da Fada"], ["Circhester", "Gordie e Melony", "Insígnia da Pedra e do Gelo"], ["Spikemuth", "Marnie", "Insígnia das Trevas"], ["Hammerlocke", "Raihan", "Insígnia do Dragão"] ],
+        liga: "A última região: a Liga de Galar espera quem chegar com as oito insígnias." }
+    ],
+
+    pokedex: [
+      { id: "kanto", label: "Kanto", count: 151, src: "img/pokedex_kanto.png", w: 1600, h: 1206 },
+      { id: "johto", label: "Johto", count: 256, src: "img/pokedex_johto.png", w: 1600, h: 1766 },
+      { id: "galar", label: "Galar", count: 400, src: "img/pokedex_galar.png", w: 1600, h: 2550 },
+      { id: "completa", label: "Lista completa", count: 898, src: "img/pokedex_completa.png", w: 2360, h: 4534 }
+    ],
+
+    screenshots: [
+      { src: "img/cine_plato.png", title: "Platô Índigo", text: "O prédio da Liga, no alto da escadaria, fim da jornada em Kanto." },
+      { src: "img/cine_rota27.png", title: "Rota 27", text: "A estrada beirando o mar, rumo à fronteira com Johto." },
+      { src: "img/cine_newbark.png", title: "New Bark", text: "A cidade onde Johto começa, com o laboratório do Professor Elm." },
+      { src: "img/cine_ceu_galar.png", title: "Céu de Galar", text: "O táxi voador leva o desafiante de volta para a última região." }
+    ],
+    steps: [
+      "Clique em “Baixar grátis” e salve o arquivo compactado no seu computador.",
+      "Extraia o arquivo em uma pasta. Não rode o jogo de dentro do zip.",
+      "Abra o arquivo Game.exe e escolha com quem vai jogar."
+    ]
+  };
+
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+
+    $("metaVersion").textContent = CONFIG.version;
+    $("metaPlatform").textContent = CONFIG.platform;
+    $("metaSize").textContent = CONFIG.size;
+    $("contactMail").textContent = CONFIG.contactEmail;
+    $("mailBtn").href = "mailto:" + CONFIG.contactEmail + "?subject=" + encodeURIComponent("Apoio ao Desafio das Três Regiões");
+    if (CONFIG.authorName) $("authorLine").textContent = "Criado por " + CONFIG.authorName + ".";
+
+    var dl = $("downloadBtn");
+    if (CONFIG.downloadUrl) { dl.href = CONFIG.downloadUrl; }
+    else { dl.setAttribute("aria-disabled", "true"); dl.removeAttribute("href"); dl.textContent = "Download em breve"; }
+
+    CONFIG.about.forEach(function (t, i) { var p = el("p", i === 0 ? "big" : "", t); if (i === 0) p.style.color = "var(--fg)"; $("aboutText").appendChild(p); });
+    CONFIG.facts.forEach(function (f) { var li = el("li"); li.appendChild(el("span", "", f.label)); li.appendChild(el("b", "", f.value)); $("facts").appendChild(li); });
+    CONFIG.features.forEach(function (f) { var li = el("li"); li.appendChild(el("h3", "", f.title)); li.appendChild(el("p", "", f.text)); $("features").appendChild(li); });
+
+    CONFIG.story.forEach(function (t, i) {
+      $("story").appendChild(el("p", "", t));
+      if (i === 1 && CONFIG.pull) $("story").appendChild(el("p", "pull", CONFIG.pull));
+    });
+    CONFIG.steps.forEach(function (t) { $("steps").appendChild(el("li", "", t)); });
+
+    // avatares em pixel art
+    var GRID = ["...HHHHHH...","..HHHHHHHH..","..HSSSSSSH..","..SSKSSKSS..","..SSSSSSSS..","....SSSS....","..BBBBBBBB..",".SBBBBBBBBS.",".SBBBBBBBBS.","..BBBBBBBB..","..LLL..LLL..","..LLL..LLL..","..KKK..KKK.."];
+    var LOOKS = [
+      { H: "#5b2a86", S: "#c68b5e", B: "#8e1b2c", L: "#e8e8ee", K: "#1a1a22" },
+      { H: "#2b1a12", S: "#f1c9a0", B: "#c0392b", L: "#2f4a8a", K: "#14161f" },
+      { H: "#1f9bb0", S: "#a9714a", B: "#2f6fd1", L: "#e3e9f2", K: "#14161f" },
+      { H: "#7a4b2a", S: "#f1c9a0", B: "#1c1c26", L: "#2b2b36", K: "#0c0c12" },
+      { H: "#e8c34a", S: "#f4d6b4", B: "#2a2a31", L: "#2a2a31", K: "#0c0c12" },
+      { H: "#5a3a22", S: "#f1c9a0", B: "#d14a7a", L: "#3b2f4a", K: "#14161f" }
+    ];
+    function avatar(i, nome) {
+      var c = document.createElement("canvas"), px = 10, look = LOOKS[i % LOOKS.length];
+      c.width = 12 * px; c.height = GRID.length * px; c.setAttribute("role", "img"); c.setAttribute("aria-label", "Avatar em pixel art de " + nome);
+      var g = c.getContext("2d");
+      GRID.forEach(function (row, y) { for (var x = 0; x < 12; x++) { var k = row[x]; if (k !== ".") { g.fillStyle = look[k]; g.fillRect(x * px, y * px, px, px); } } });
+      return c;
+    }
+    CONFIG.characters.forEach(function (ch, i) {
+      var card = el("article", "card"), p = el("div", "portrait");
+      if (ch.image) { var im = new Image(); im.src = ch.image; im.alt = ch.name; p.appendChild(im); } else { p.appendChild(avatar(i, ch.name)); }
+      var info = el("div", "info");
+      info.appendChild(el("span", "role " + (ch.start === "Kanto" ? "k" : "g"), "COMEÇA EM " + ch.start.toUpperCase()));
+      info.appendChild(el("h3", "", ch.name));
+      info.appendChild(el("p", "", ch.text));
+      card.appendChild(p); card.appendChild(info); $("cast").appendChild(card);
+    });
+
+    CONFIG.regions.forEach(function (r) {
+      var box = el("article", "region " + r.id), head = el("header");
+      head.appendChild(el("h3", "", r.name)); head.appendChild(el("span", "", r.sub));
+      var ol = el("ol");
+      r.gyms.forEach(function (g) {
+        var li = el("li"), d = el("div");
+        d.appendChild(el("b", "", g[1] + " · " + g[0])); d.appendChild(el("small", "", g[2])); li.appendChild(d); ol.appendChild(li);
+      });
+      box.appendChild(head); box.appendChild(ol); box.appendChild(el("div", "liga", r.liga)); $("regions").appendChild(box);
+    });
+
+    // Pokédex em abas
+    (function () {
+      var tabs = $("dexTabs"), btns = [];
+      function show(d) {
+        $("dexImg").src = d.src; $("dexImg").width = d.w; $("dexImg").height = d.h;
+        $("dexImg").alt = "Pokédex de " + d.label + " do jogo, com " + d.count + " Pokémon";
+        $("dexLink").href = d.src;
+        $("dexCap").textContent = d.id === "completa"
+          ? "Lista completa: " + d.count + " Pokémon, da 1ª à 8ª geração. Clique na imagem para abrir em tamanho real."
+          : "Pokédex de " + d.label + ": " + d.count + " Pokémon. Clique na imagem para abrir em tamanho real.";
+        btns.forEach(function (b) { b.setAttribute("aria-selected", b.dataset.id === d.id ? "true" : "false"); });
+      }
+      CONFIG.pokedex.forEach(function (d) {
+        var b = el("button", "tab"); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.id = d.id;
+        b.appendChild(document.createTextNode(d.label)); b.appendChild(el("small", "", String(d.count)));
+        b.addEventListener("click", function () { show(d); });
+        tabs.appendChild(b); btns.push(b);
+      });
+      show(CONFIG.pokedex[0]);
+    })();
+
+    CONFIG.screenshots.forEach(function (s) {
+      var f = el("figure"), im = new Image(); im.src = s.src; im.alt = s.title + ": cenário do jogo"; im.loading = "lazy";
+      var cap = el("figcaption"); cap.appendChild(el("b", "", s.title + ". ")); cap.appendChild(document.createTextNode(s.text));
+      f.appendChild(im); f.appendChild(cap); $("shots").appendChild(f);
+    });
+
+    CONFIG.extraLinks.forEach(function (l) {
+      var a = el("a", "btn btn-ghost", l.label); a.href = l.url; a.target = "_blank"; a.rel = "noopener"; $("extraLinks").appendChild(a);
+    });
+
+    function selectKey() { var r = document.createRange(); r.selectNodeContents($("contactMail")); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+    $("copyMail").addEventListener("click", function () {
+      var msg = $("copyMsg");
+      function done(ok) { msg.textContent = ok ? "E-mail copiado!" : "Selecione o e-mail acima e copie."; if (!ok) selectKey(); setTimeout(function () { msg.textContent = ""; }, 4000); }
+      try { navigator.clipboard.writeText(CONFIG.contactEmail).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+    });
+  })();
+</script>
+
+</body></html>
