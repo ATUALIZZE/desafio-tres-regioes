@@ -325,7 +325,7 @@
   var CONFIG = {
     authorName: "",                 // opcional: aparece no rodapé como "Criado por ..."
     downloadUrl: "https://github.com/ATUALIZZE/desafio-tres-regioes/releases/latest",                // cole aqui o link de download (Drive, Mega, itch.io, GitHub...)
-    version: "0.28",
+    version: "0.29",
     platform: "Windows 64 bits",
     size: "97 MB",
     contactEmail: "evecarr@gmail.com",   // e-mail de contato para quem quiser apoiar
@@ -390,7 +390,10 @@
       { id: "kanto", label: "Kanto", count: 151, src: "img/pokedex_kanto.png", w: 1600, h: 1206 },
       { id: "johto", label: "Johto", count: 256, src: "img/pokedex_johto.png", w: 1600, h: 1766 },
       { id: "galar", label: "Galar", count: 400, src: "img/pokedex_galar.png", w: 1600, h: 2550 },
-      { id: "completa", label: "Lista completa", count: 898, src: "img/pokedex_completa.png", w: 2360, h: 4534 }
+      { id: "completa", label: "Lista completa", count: 898, src: "img/pokedex_completa.png", w: 2360, h: 4534 },
+      { id: "dia_noite", label: "Dia e noite", count: "☀ ☾", src: "img/pokedex_dia_noite.png", w: 1600, h: 3160,
+        alt: "Quais Pokémon selvagens aparecem de dia e quais aparecem de noite, em Kanto, Johto e Galar",
+        cap: "De dia e de noite: o jogo segue o relógio do aparelho. De dia (5h às 20h) e de noite (20h às 5h) aparecem Pokémon diferentes na grama e em algumas cavernas. Clique na imagem para abrir em tamanho real." }
     ],
 
     screenshots: [
@@ -477,9 +480,9 @@
       var tabs = $("dexTabs"), btns = [];
       function show(d) {
         $("dexImg").src = d.src; $("dexImg").width = d.w; $("dexImg").height = d.h;
-        $("dexImg").alt = "Pokédex de " + d.label + " do jogo, com " + d.count + " Pokémon";
+        $("dexImg").alt = d.alt || ("Pokédex de " + d.label + " do jogo, com " + d.count + " Pokémon");
         $("dexLink").href = d.src;
-        $("dexCap").textContent = d.id === "completa"
+        $("dexCap").textContent = d.cap ? d.cap : d.id === "completa"
           ? "Lista completa: " + d.count + " Pokémon, da 1ª à 8ª geração. Clique na imagem para abrir em tamanho real."
           : "Pokédex de " + d.label + ": " + d.count + " Pokémon. Clique na imagem para abrir em tamanho real.";
         btns.forEach(function (b) { b.setAttribute("aria-selected", b.dataset.id === d.id ? "true" : "false"); });
